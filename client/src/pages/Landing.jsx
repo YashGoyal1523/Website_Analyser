@@ -238,12 +238,9 @@ const Landing = () => {
 
             {/* ── CTA banner ────────────────────────────────────────── */}
             <section className="bg-blue-600 py-20 px-6 text-center">
-                <h2 className="text-3xl font-bold text-white tracking-tight mb-3">
+                <h2 className="text-3xl font-bold text-white tracking-tight mb-8">
                     Ready to audit your website?
                 </h2>
-                <p className="text-blue-200 mb-8 text-base">
-                    Free to use. No credit card required.
-                </p>
                 <button
                     onClick={handleCTA}
                     className="bg-white text-blue-600 hover:bg-blue-50 font-semibold px-8 py-3.5 rounded-xl transition-colors text-[15px]"
