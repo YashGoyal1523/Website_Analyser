@@ -43,6 +43,10 @@ const History = () => {
         navigate(`/dashboard?${params.toString()}`)
     }
 
+    const handleDelete = (id) => {
+        deleteAnalysis(id)
+    }
+
     const handleCardClick = (id) => {
         setSelectedIds(prev => {
             if (prev.includes(id)) return prev.filter(x => x !== id)
@@ -205,7 +209,7 @@ const History = () => {
                             onClick={() => handleCardClick(analysis._id)}
                             onView={() => handleView(analysis._id)}
                             onRerun={() => handleRerun(analysis)}
-                            onDelete={() => deleteAnalysis(analysis._id)}
+                            onDelete={() => handleDelete(analysis._id)}
                             compareMode={compareMode}
                             isSelected={selectedIds.includes(analysis._id)}
                         />

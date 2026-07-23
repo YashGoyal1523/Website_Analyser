@@ -430,8 +430,8 @@ const Home = () => {
                                     {sequence.map((item, i) => {
 
                                         if (item.type === 'analyse') return (
-                                            <div key={i} className="bg-purple-50 border border-purple-200 border-l-4 border-l-purple-500 rounded-xl p-2.5">
-                                                <div className="flex items-center gap-2">
+                                            <div key={i} className="bg-purple-50 border border-purple-200 border-l-4 border-l-purple-500 rounded-xl p-4">
+                                                <div className="flex items-center gap-3">
                                                     <span className="w-2 h-2 rounded-full shrink-0 bg-purple-500" />
                                                     <span className="text-xs text-gray-400 font-medium w-4 shrink-0">{i + 1}</span>
                                                     <div className="flex items-center gap-1.5 shrink-0">
@@ -451,7 +451,7 @@ const Home = () => {
                                                         />
                                                     </div>
                                                     <button type="button" onClick={() => removeItem(i)} disabled={loading} className="ml-auto text-gray-300 hover:text-red-400 transition-colors shrink-0 disabled:opacity-50">
-                                                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" /></svg>
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" /></svg>
                                                     </button>
                                                 </div>
                                             </div>
@@ -461,13 +461,8 @@ const Home = () => {
                                             <div key={i} className={`bg-gray-50 border border-gray-200 border-l-4 ${STEP_BORDER[item.type]} rounded-xl p-2.5`}>
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-xs text-gray-400 font-medium w-4 shrink-0">{i + 1}</span>
-                                                    <StepTypeSelect
-                                                        value={item.type}
-                                                        onChange={type => changeStepType(i, type)}
-                                                        disabled={loading}
-                                                        options={STEP_LABELS}
-                                                        dotColors={STEP_DOT}
-                                                    />
+                                                    <StepTypeSelect value={item.type} onChange={type => changeStepType(i, type)} disabled={loading}
+                                                        options={STEP_LABELS} dotColors={STEP_DOT} />
                                                     <span className="text-[11px] font-medium text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full shrink-0">
                                                         {STEP_TIME[item.type]}s
                                                     </span>
