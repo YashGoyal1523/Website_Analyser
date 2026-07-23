@@ -4,7 +4,7 @@ import { AppContext } from '../context/AppContext'
 import AnalysisCard from '../components/AnalysisCard'
 
 const History = () => {
-    const { userAnalyses, fetchUserAnalyses } = useContext(AppContext)
+    const { userAnalyses, fetchUserAnalyses, deleteAnalysis } = useContext(AppContext)
     const navigate = useNavigate()
     const [fetching, setFetching]   = useState(false)
     const [search, setSearch]       = useState('')
@@ -205,6 +205,7 @@ const History = () => {
                             onClick={() => handleCardClick(analysis._id)}
                             onView={() => handleView(analysis._id)}
                             onRerun={() => handleRerun(analysis)}
+                            onDelete={() => deleteAnalysis(analysis._id)}
                             compareMode={compareMode}
                             isSelected={selectedIds.includes(analysis._id)}
                         />

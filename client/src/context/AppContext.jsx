@@ -78,6 +78,24 @@ const AppContextProvider = ({ children }) => {
         }
     }
 
+    const deleteAnalysis = async (id) => {
+        try {
+            const { data } = await axios.delete(`${backendUrl}/api/analyses/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            if (data.success) {
+                setUserAnalyses(prev => prev.filter(a => a._id !== id))
+                toast.success('Analysis deleted')
+                return true
+            }
+            toast.error(data.message)
+            return false
+        } catch (e) {
+            toast.error(e.response?.data?.message || 'Failed to delete analysis')
+            return false
+        }
+    }
+
     const logout = () => {
         setToken('')
         setUser(null)
@@ -158,6 +176,7 @@ const AppContextProvider = ({ children }) => {
         openAuth,
         userAnalyses,
         fetchUserAnalyses,
+        deleteAnalysis,
     }
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>

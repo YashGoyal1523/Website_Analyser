@@ -23,24 +23,41 @@ const METRICS = [
     { key: 'cls', label: 'CLS', fmt: v => v.toFixed(3) },
 ]
 
-const AnalysisCard = ({ analysis, onClick, onView, onRerun, compareMode = false, isSelected = false }) => {
+const AnalysisCard = ({ analysis, onClick, onView, onRerun, onDelete, compareMode = false, isSelected = false }) => {
     const { url, lighthouseData, createdAt, mode } = analysis
     const date    = new Date(createdAt)
     const domain  = url.replace(/^https?:\/\//, '').replace(/\/$/, '')
     const dateStr = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
     const timeStr = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
 
+    const handleDelete = (e) => {
+        e.stopPropagation()
+        if (window.confirm(`Delete this analysis for ${domain}? This can't be undone.`)) onDelete()
+    }
+
     return (
         <div
             onClick={compareMode ? onClick : undefined}
-            className={`bg-white border rounded-2xl px-6 py-5 shadow-sm transition-all ${
+            className={`relative bg-white border rounded-2xl px-6 py-5 shadow-sm transition-all ${
                 compareMode
                     ? `cursor-pointer ${isSelected ? 'border-blue-400 ring-2 ring-blue-50' : 'border-gray-100 hover:border-blue-200 hover:shadow-md'}`
                     : 'border-gray-100 hover:shadow-md hover:border-gray-200'
             }`}
         >
+            {!compareMode && (
+                <button
+                    onClick={handleDelete}
+                    aria-label="Delete analysis"
+                    className="absolute top-4 right-4 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg p-1 transition-colors"
+                >
+                    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />
+                    </svg>
+                </button>
+            )}
+
             {/* Top row */}
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start justify-between gap-4 pr-6">
                 <div className="flex items-start gap-3 min-w-0 flex-1">
                     {compareMode && (
                         <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
