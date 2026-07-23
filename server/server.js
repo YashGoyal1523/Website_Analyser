@@ -18,4 +18,8 @@ app.get('/', (req, res) => res.send('WebsiteAnalyser API working'))
 
 connectDB().then(() => {
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+}).catch((err) => {
+  console.error('Failed to connect to the database. Check your MONGODB_URI.')
+  console.error(err.message)
+  process.exit(1)
 })
