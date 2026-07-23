@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 
@@ -6,6 +7,24 @@ export const AppContext = createContext()
 
 export const LIGHTHOUSE_AUDIT_SECONDS = 7
 export const PAGE_LOAD_ESTIMATE_SECONDS = 8
+
+// Registered at module load — guaranteed to exist before any request fires,
+// unlike an interceptor added inside a component effect (axios snapshots the
+// interceptor chain when a request is *issued*, so a component-level effect
+// can lose the race against a child component's own first request on mount).
+// The actual session-clearing logic lives in the component via this listener
+// set, since it needs React state setters and the router's navigate().
+const sessionExpiredListeners = new Set()
+axios.interceptors.response.use(
+    (res) => res,
+    (error) => {
+        const isAuthRoute = error.config?.url?.includes('/api/auth/')
+        if (error.response?.status === 401 && !isAuthRoute) {
+            sessionExpiredListeners.forEach(fn => fn())
+        }
+        return Promise.reject(error)
+    }
+)
 
 const AppContextProvider = ({ children }) => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL
@@ -17,11 +36,31 @@ const AppContextProvider = ({ children }) => {
     const [userAnalyses, setUserAnalyses] = useState([])
     const [showAuth, setShowAuth] = useState(false)
     const [authMode, setAuthMode] = useState('login')
+    const navigate = useNavigate()
 
     useEffect(() => {
         const savedUser = localStorage.getItem('user')
         if (savedUser && token) setUser(JSON.parse(savedUser))
     }, [])
+
+    // A 401 on an authenticated request means the JWT expired or is invalid —
+    // localStorage doesn't know that on its own, so this is what clears the
+    // stale session and kicks the user back to login instead of leaving the
+    // app stuck in a half-logged-in state.
+    useEffect(() => {
+        const handleSessionExpired = () => {
+            setToken('')
+            setUser(null)
+            setAnalysisData(null)
+            setUserAnalyses([])
+            localStorage.removeItem('token')
+            localStorage.removeItem('user')
+            toast.error('Session expired. Please log in again.')
+            navigate('/')
+        }
+        sessionExpiredListeners.add(handleSessionExpired)
+        return () => sessionExpiredListeners.delete(handleSessionExpired)
+    }, [navigate])
 
     const openAuth = (mode = 'login') => {
         setAuthMode(mode)
@@ -91,7 +130,7 @@ const AppContextProvider = ({ children }) => {
             toast.error(data.message)
             return false
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to delete analysis')
+            if (e.response?.status !== 401) toast.error(e.response?.data?.message || 'Failed to delete analysis')
             return false
         }
     }
@@ -150,7 +189,7 @@ const AppContextProvider = ({ children }) => {
             toast.error(data.message)
             return false
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Analysis failed. Is the server running?')
+            if (error.response?.status !== 401) toast.error(error.response?.data?.message || 'Analysis failed. Is the server running?')
             return false
         } finally {
             clearInterval(timer)
